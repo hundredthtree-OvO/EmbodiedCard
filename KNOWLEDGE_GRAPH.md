@@ -9,9 +9,11 @@ flowchart LR
     K --> E["ELBO"]
     E --> V
     V --> C["CVAE"]
+    V --> Q["VQ-VAE"]
+    Q --> S["离散 latent tokens"]
 ```
 
-文字说明：AutoEncoder 提供编码—解码结构；概率分布和 KL Divergence 支撑 ELBO；VAE 在此基础上进一步通向 CVAE。
+文字说明：AutoEncoder 提供编码—解码结构；概率分布和 KL Divergence 支撑 ELBO；VAE 进一步通向 CVAE，也可通过 VQ-VAE 转向离散 latent tokens。
 
 ## 具身智能应用路线
 

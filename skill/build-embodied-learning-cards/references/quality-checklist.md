@@ -15,12 +15,16 @@
 - Are maximization objectives and minimized losses distinguished by sign?
 - Are prior, approximate posterior, and true posterior distinguished?
 - Are per-sample, per-dimension, sum, and mean reductions explicit?
+- Is every key objective connected through assumption, simplification or estimator, tensor operation, and reduction?
+- Does the prose distinguish exact equality, equality up to constants or scale, Monte Carlo estimates, and engineering surrogates?
 - Was every numeric example independently recalculated?
 - Are all inline formulas delimited by `$` and display formulas enclosed by fenced `math` blocks?
 
 ## Code
 
 - Does the PyTorch code implement the exact convention used by the equations?
+- Is every MSE, BCE, cross-entropy, straight-through operation, and sampled expectation mathematically motivated near the code?
+- Does the formula-to-code mapping state the modeling assumption and output shape/reduction rather than only pair names?
 - Are tensor shapes stated?
 - Is the code minimal enough to expose the mechanism?
 - Was each Python block syntax-checked and executed when dependencies are available?

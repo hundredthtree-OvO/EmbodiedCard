@@ -171,7 +171,31 @@ D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p(z)\right)
 ```
 
-重建项由似然假设决定：Bernoulli 常对应 BCE，固定方差 Gaussian 常对应与 MSE 成比例的负对数似然。
+重建项不是预先指定为 MSE 或 BCE，而是由观测似然决定。若 Decoder 把连续观测建模为固定方差高斯分布：
+
+```math
+p_\theta(x\mid z)=\mathcal{N}\!\left(x;\mu_\theta(z),\sigma_x^2I\right)
+```
+
+则单样本负对数似然为：
+
+```math
+-\log p_\theta(x\mid z)
+=
+\frac{1}{2\sigma_x^2}\left\|x-\mu_\theta(z)\right\|_2^2+C
+```
+
+$C$ 与模型参数无关；当 $\sigma_x^2$ 固定时，前面的比例系数也固定。因此最小化负对数似然，与最小化平方误差具有相同的最优点。代码使用 MSE 是在实现这个特定似然假设下的简化目标，而不是把 $\log p_\theta(x\mid z)$ 任意替换掉。若像素服从 Bernoulli 分布，则对应 BCE；若还要学习高斯方差，Decoder 必须额外输出方差，裸 MSE 就不再是完整 NLL。
+
+ELBO 中的期望也需要落到计算上。训练时通常对每个 $x$ 从 $q_\phi(z\mid x)$ 采一个 $z$，用单样本 Monte Carlo 估计：
+
+```math
+\mathbb{E}_{q_\phi(z\mid x)}[\log p_\theta(x\mid z)]
+\approx
+\log p_\theta(x\mid z^{(1)})
+```
+
+这只是无偏的随机估计，不是把期望严格变成一个确定值；batch 平均会进一步降低梯度噪声。
 
 ### 3. 公式的逐步解释或推导
 
@@ -266,23 +290,32 @@ class VAE(nn.Module):
 
 
 def vae_loss(recon, x, mu, logvar):
+    # 固定方差 Gaussian likelihood 的 NLL 与平方误差只差固定比例和常数。
+    # reduction="none" 保留逐元素误差，再对非 batch 维求和，得到 [B]。
     recon_nll = F.mse_loss(
         recon, x, reduction="none"
     ).flatten(1).sum(1)
+
+    # 对角 Gaussian q(z|x) 与 N(0, I) 的解析 KL；对 latent 维求和为 [B]。
     kl = -0.5 * (
         1 + logvar - mu.square() - logvar.exp()
     ).sum(1)
+
+    # 先组成每个样本的负 ELBO，再对 batch 取均值。
     return (recon_nll + kl).mean()
 ```
 
 ### 8. 公式—代码对应
 
-| 数学对象 | PyTorch |
-|---|---|
-| $\mu_\phi(x)$ | `self.to_mu(h)` |
-| $\log\sigma_\phi^2(x)$ | `self.to_logvar(h)` |
-| $\sigma=\exp(\frac12\log\sigma^2)$ | `torch.exp(0.5 * logvar)` |
-| $z=\mu+\sigma\odot\epsilon$ | `mu + std * eps` |
+| 数学对象 | PyTorch | 转换依据 | 形状与 reduction |
+|---|---|---|---|
+| $\mu_\phi(x)$ | `self.to_mu(h)` | Encoder 直接参数化 posterior mean | `[B, D_z]` |
+| $\log\sigma_\phi^2(x)$ | `self.to_logvar(h)` | 用无约束实数表示正方差 | `[B, D_z]` |
+| $\sigma=\exp(\frac12\log\sigma^2)$ | `torch.exp(0.5 * logvar)` | 从 log variance 恢复标准差，严格等式 | `[B, D_z]` |
+| $z=\mu+\sigma\odot\epsilon$ | `mu + std * torch.randn_like(std)` | 重参数化；一次噪声样本给出期望的 Monte Carlo 估计 | `[B, D_z]` |
+| $-\log p_\theta(x\mid z)$ | `F.mse_loss(..., reduction="none")` | 固定方差 Gaussian NLL，忽略常数与固定比例 | 逐元素，再对非 batch 维求和为 `[B]` |
+| $D_{\mathrm{KL}}(q_\phi\|p)$ | `-0.5 * (...).sum(1)` | 对角高斯到标准正态 KL 的闭式解 | latent 维求和为 `[B]` |
+| $-\mathcal{L}_{\mathrm{ELBO}}$ | `(recon_nll + kl).mean()` | 每样本负 ELBO 后进行经验 batch 平均 | scalar |
 
 ### 9. 常见超参数
 
@@ -356,7 +389,7 @@ VAE 不只是“给 AE latent 加噪声”；KL 也不是越小越好；连续 l
 ### 对比卡片
 
 - VAE vs AutoEncoder（待创建）
-- VAE vs VQ-VAE（待创建）
+- [VAE vs VQ-VAE：见 VQ-VAE 对比表](./VQ-VAE.md#6-与相近方法的区别)
 
 ### 下一张推荐卡
 

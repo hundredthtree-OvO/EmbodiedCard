@@ -23,7 +23,7 @@ Create durable, technically rigorous learning cards that explain not only what a
 3. Research before writing when claims depend on a paper, implementation, current method, or exact architecture. Follow `references/source-policy.md`.
 4. Start from `assets/card-template.md`. Include L0–L2 unless the user requests another depth. Leave a concise L3 backlog rather than expanding it automatically.
 5. Connect the concept to concrete embodied uses. Distinguish a classical module from descendants that merely share its principles; for example, do not call RSSM a plain VAE.
-6. Include minimal PyTorch when implementation helps understanding. State the likelihood or modeling assumptions behind a loss rather than presenting MSE/BCE as arbitrary choices.
+6. Include minimal PyTorch when implementation helps understanding. For every key loss or estimator, connect the mathematical objective to code through the modeling assumption, algebraic simplification, approximation, tensor shape, and reduction. Never present MSE, BCE, cross-entropy, a straight-through estimator, or a sampled expectation as an unexplained replacement for the equation.
 7. Add compact Mermaid only when structure, sequence, or dependency is easier to understand visually. Always follow a diagram with a one-sentence text equivalent.
 8. Add self-tests at memory, understanding, and transfer levels. Put answers in standard HTML `<details>` blocks compatible with GitHub.
 9. Add primary references and label inferences as inferences.
@@ -42,7 +42,7 @@ Target standard VS Code Markdown Preview and GitHub Markdown, not Obsidian synta
 - Avoid tabs and unescaped control characters in formulas.
 - Use `\begin{aligned}...\end{aligned}` only inside fenced `math` blocks.
 - Prefer LaTeX commands such as `\mu`, `\theta`, and `\mathcal{L}` inside math delimiters; Unicode symbols are acceptable in diagrams and prose.
-- Mention that VS Code's built-in preview must have `markdown.math.enabled` enabled if valid `$`/`$$` formulas still do not render.
+- Mention that VS Code's built-in preview must have `markdown.math.enabled` enabled if valid inline or fenced-math formulas still do not render.
 
 ## Preserve pedagogical order
 
@@ -50,7 +50,7 @@ Use this sequence:
 
 1. **L0 — orientation**: one-sentence definition, problem solved, embodied role, three takeaways.
 2. **L1 — mental model**: predecessor's limitation, intuition, architecture/data flow, inputs and outputs, VLA/WAM placement, nearby-method comparison.
-3. **L2 — mechanism**: notation, core equations, derivation at the appropriate depth, numeric example, tensor shapes, training versus inference, pseudocode, PyTorch, formula-to-code mapping, hyperparameters, failure modes, misconceptions.
+3. **L2 — mechanism**: notation, core equations, derivation at the appropriate depth, numeric example, tensor shapes, training versus inference, pseudocode, PyTorch, formula-to-code mapping with assumptions and reductions, hyperparameters, failure modes, misconceptions.
 4. **Navigation**: prerequisites, atomic child cards, comparisons, and next card.
 5. **L3 backlog**: paper-level derivations, source mapping, variants, and open research questions to add later.
 
@@ -74,6 +74,8 @@ Read `references/quality-checklist.md` before finalizing a new template style or
 - symbols are defined before use;
 - posterior, prior, likelihood, loss, and inference-time behavior are not conflated;
 - equations and code use the same reduction and sign conventions;
+- each key equation follows the chain `objective → assumption → simplification or estimator → tensor operation → reduction`;
+- wording distinguishes exact equality, equality up to constants or scale, Monte Carlo estimates, and engineering surrogates;
 - numeric examples reproduce the stated result;
 - local links resolve;
 - external claims have authoritative sources;

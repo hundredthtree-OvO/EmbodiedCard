@@ -205,6 +205,15 @@ Jensen 路线：
 
 Jensen 直接证明下界；KL 恒等式说明 gap。
 
+把推导和训练实现连起来，可以分成四步：
+
+1. **目标**：最大化 $\mathbb{E}_{q_\phi}[\log p_\theta(x\mid z)]-D_{\mathrm{KL}}(q_\phi\|p)$；优化器通常改为最小化其相反数。
+2. **期望的估计**：从 $q_\phi(z\mid x)$ 取 $L$ 个重参数化样本，用 Monte Carlo 平均近似期望；常见最小实现取 $L=1$，它是随机估计而非代数恒等式。
+3. **似然的实现**：`log_px_given_z` 必须由选定的观测分布得到。固定方差 Gaussian 可化为与平方误差成比例的 NLL，Bernoulli 则对应 BCE；ELBO 本身没有规定必须使用哪一种。
+4. **KL 与 reduction**：标准 VAE 的 Gaussian KL 有闭式解，先对 latent 维求和得到每样本 `[B]`，再和每样本 log-likelihood 组合，最后对 batch 取均值。
+
+因此代码中的 loss 不是公式之外的新目标，而是“选择似然 + 估计期望 + 采用明确 reduction”之后的负 ELBO。
+
 ### 4. 最小数值例子
 
 设：
@@ -257,10 +266,17 @@ D_{\mathrm{KL}}(q\|p)\approx0.131
 
 ```python
 def negative_elbo(log_px_given_z, mu, logvar):
+    # 对角 Gaussian posterior 到标准正态 prior 的闭式 KL。
+    # 对 latent 维求和，kl 和 log_px_given_z 都应为每样本 shape [B]。
     kl = -0.5 * (
         1 + logvar - mu.square() - logvar.exp()
     ).sum(dim=-1)
+
+    # log_px_given_z 是一次或多次 Monte Carlo 样本给出的期望对数似然估计。
+    # 它的具体计算取决于 likelihood；例如固定方差 Gaussian 可用平方误差实现。
     elbo = log_px_given_z - kl
+
+    # 优化器最小化负 ELBO；最后只在 batch 维取均值。
     return -elbo.mean(), {
         "elbo": elbo.mean().detach(),
         "kl": kl.mean().detach(),
@@ -269,12 +285,13 @@ def negative_elbo(log_px_given_z, mu, logvar):
 
 ### 8. 公式—代码对应
 
-| 数学对象 | PyTorch |
-|---|---|
-| $\log p_\theta(x\mid z)$ | `log_px_given_z` |
-| prior KL | `kl` |
-| ELBO | `log_px_given_z - kl` |
-| 负 ELBO | `-elbo.mean()` |
+| 数学对象 | PyTorch | 转换依据 | 形状与 reduction |
+|---|---|---|---|
+| $\log p_\theta(x\mid z)$ | `log_px_given_z` | 由选定 likelihood 计算；不是固定等于某种 loss | 每样本 `[B]` |
+| $\mathbb{E}_{q_\phi}[\log p_\theta(x\mid z)]$ | 重参数化采样后的 `log_px_given_z` | 单样本或多样本 Monte Carlo 估计 | 样本维平均后为 `[B]` |
+| $D_{\mathrm{KL}}(q_\phi\|p)$ | `-0.5 * (...).sum(-1)` | 对角 Gaussian KL 的闭式解 | latent 维求和为 `[B]` |
+| $\mathcal{L}_{\mathrm{ELBO}}$ | `log_px_given_z - kl` | 与公式严格同号组合 | `[B]` |
+| $-\mathcal{L}_{\mathrm{ELBO}}$ | `-elbo.mean()` | 改写为最小化目标，并对经验 batch 平均 | scalar |
 
 ### 9. 常见超参数
 

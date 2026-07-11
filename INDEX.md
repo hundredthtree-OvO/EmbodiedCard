@@ -4,6 +4,7 @@
 |---|---|---|---|---|
 | Variational Autoencoder | [VAE.md](representations/latent/VAE.md) | L0–L2 | learning | 理解概率潜变量、重参数化及其具身智能用途 |
 | Evidence Lower Bound | [ELBO.md](representations/latent/ELBO.md) | L0–L2 | learning | 理解 VAE/变分模型训练目标的数学来源 |
+| Vector-Quantized VAE | [VQ-VAE.md](representations/latent/VQ-VAE.md) | L0–L2 | learning | 理解离散 codebook、straight-through 与具身 tokenization |
 
 ## 待创建的原子卡
 

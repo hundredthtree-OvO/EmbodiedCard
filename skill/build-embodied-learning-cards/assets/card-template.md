@@ -73,6 +73,8 @@ Use display math exactly like this:
 
 ### 3. 公式的逐步解释或推导
 
+For every nontrivial step, state the identity, modeling assumption, approximation, or omitted constant/scale. Explain what each term makes the model do and how expectations are estimated in code.
+
 ### 4. 最小数值例子
 
 ### 5. 训练与推理
@@ -82,10 +84,13 @@ Use display math exactly like this:
 ### 7. 最小 PyTorch 实现
 
 ```python
-# Include only the mechanism needed to connect equations to code.
+# Explain why each key loss or estimator implements the preceding equation.
+# State tensor shapes and reduction dimensions where they affect scaling.
 ```
 
 ### 8. 公式—代码对应
+
+Use columns such as `数学对象 | 代码 | 转换依据 | 形状与 reduction`. Distinguish exact implementations from proportional objectives, Monte Carlo estimates, straight-through estimators, and engineering surrogates.
 
 ### 9. 常见超参数
 
