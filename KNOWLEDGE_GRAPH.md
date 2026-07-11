@@ -1,0 +1,26 @@
+# 知识依赖图
+
+## VAE 主线
+
+```mermaid
+flowchart LR
+    P["概率分布"] --> K["KL Divergence"]
+    A["AutoEncoder"] --> V["VAE"]
+    K --> E["ELBO"]
+    E --> V
+    V --> C["CVAE"]
+```
+
+文字说明：AutoEncoder 提供编码—解码结构；概率分布和 KL Divergence 支撑 ELBO；VAE 在此基础上进一步通向 CVAE。
+
+## 具身智能应用路线
+
+```mermaid
+flowchart TD
+    V["VAE / CVAE"] --> A["ACT 动作风格 latent"]
+    V --> W["视觉 latent world model"]
+    W --> R["RSSM"]
+    R --> I["Latent imagination"]
+```
+
+文字说明：VAE/CVAE 的概率潜变量思想分别进入动作序列生成和世界模型；RSSM 则进一步处理时序状态与想象 rollout。
