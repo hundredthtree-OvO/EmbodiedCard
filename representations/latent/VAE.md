@@ -8,7 +8,7 @@ prerequisites: [AutoEncoder, Probability-Distribution, KL-Divergence]
 related: [ELBO, Reparameterization-Trick, CVAE, VQ-VAE]
 embodied_roles: [latent-observation-compression, stochastic-latent-modeling, multimodal-action-modeling]
 created: 2026-07-11
-updated: 2026-07-11
+updated: 2026-07-12
 ---
 
 # Variational Autoencoder（VAE，变分自编码器）
@@ -44,25 +44,27 @@ ACT 使用动作序列 CVAE；Dreamer 的 RSSM 是更一般的随机潜状态模
 
 ## L1：直觉与结构
 
-### 1. 从旧方法的局限出发
+### 1. 背景：AE 已经解决了重建，但没有解决可靠采样
 
-普通 AutoEncoder：
+AutoEncoder 学习：
 
 ```math
 z=f_\phi(x),\qquad \hat{x}=g_\theta(z)
 ```
 
-只优化 $d(x,\hat{x})$ 时，训练编码之间可能存在 Decoder 从未见过的区域，从简单分布随机采样也未必得到有效样本。
+它已经能把输入压缩再重建。问题在于，重建目标只要求训练样本的编码有用，没有规定训练编码之间、之外的区域应该是什么样子。Decoder 熟悉 $f_\phi(x)$ 产生的点，却未必理解从某个简单分布随机取得的 $z$。
 
-### 2. 核心思想
+因此，“能重建”与“能从一个已知分布采样并生成”是两个不同目标。
 
-VAE 把确定性编码改为概率编码：
+### 2. 剩余矛盾与设计目标
 
-```math
-x\rightarrow q_\phi(z\mid x)
-```
+我们希望同时满足：
 
-常见近似后验为：
+1. latent 保留足够信息，让 Decoder 重建 $x$；
+2. 给定同一个 $x$ 时允许表达不确定性，而不只输出一个固定点；
+3. 不同输入的 latent 分布与一个简单 prior 保持联系，使生成时可以从 prior 采样。
+
+VAE 因此把确定性编码改为近似 posterior：
 
 ```math
 q_\phi(z\mid x)
@@ -78,7 +80,19 @@ z;\mu_\phi(x),\operatorname{diag}(\sigma_\phi^2(x))
 p(z)=\mathcal{N}(0,I)
 ```
 
-### 3. 结构或数据流
+### 3. 设计因果链
+
+| 当前问题 | 设计选择 | 解决了什么 | 新问题或代价 |
+|---|---|---|---|
+| AE latent 只是一个点 | Encoder 输出分布参数 | 可以表示不确定性并采样 | 需要训练 stochastic node |
+| 希望生成时有可用来源 | 选择简单 prior $p(z)$ | 可从已知分布采样 | posterior 可能偏离 prior |
+| 保留信息又贴近 prior | 最大化 ELBO | likelihood 与 KL 共同训练 | 两项存在权衡 |
+| 直接采样阻断普通梯度 | 重参数化 $z=\mu+\sigma\odot\epsilon$ | 随机性移到外部噪声 | 梯度仍是 Monte Carlo 估计 |
+| Decoder 太强时 KL 容易占优 | warm-up、free bits 等 | 缓解 latent 被忽略 | 引入额外训练策略 |
+
+这条链说明：概率 Encoder、prior、ELBO 和重参数化不是并列组件。前一项解决设计目标，也为下一项制造训练问题。
+
+### 4. 结构或数据流
 
 ```mermaid
 flowchart LR
@@ -90,49 +104,56 @@ flowchart LR
     V --> R
     R --> D["Decoder"]
     D --> Y["pθ(x|z)"]
+    P["prior p(z)"] -. "KL 约束" .-> R
 ```
 
-文字说明：Encoder 预测 $\mu$ 和 $\log\sigma^2$，重参数化产生 $z$，Decoder 根据 $z$ 定义观测分布。
+文字说明：Encoder 参数化 posterior，重参数化生成 $z$，Decoder 定义 likelihood；KL 使 posterior 与生成时可用的 prior 保持联系。
 
-### 4. 输入、输出与张量形状
+训练与生成的数据来源不同：
+
+- **训练/重建**：$x\rightarrow q_\phi(z\mid x)\rightarrow z\rightarrow p_\theta(x\mid z)$；
+- **生成**：$z\sim p(z)\rightarrow p_\theta(x\mid z)$，不再需要 Encoder。
+
+### 5. 输入、输出与张量形状
 
 设 batch size 为 $B$、latent dim 为 $D_z$：
 
-| 张量 | 形状 |
-|---|---|
-| `mu` | `[B, D_z]` |
-| `logvar` | `[B, D_z]` |
-| `eps` | `[B, D_z]` |
-| `z` | `[B, D_z]` |
+| 张量 | 形状 | 作用 |
+|---|---|---|
+| `mu` | `[B,D_z]` | posterior mean |
+| `logvar` | `[B,D_z]` | posterior log variance |
+| `eps` | `[B,D_z]` | 与参数无关的标准正态噪声 |
+| `z` | `[B,D_z]` | Decoder 实际接收的样本 |
+| 每样本 KL | `[B]` | latent 维求和后的 prior 约束 |
 
-### 5. 在具身智能系统中的位置
+### 6. 在具身智能系统中的位置
 
 ```mermaid
 flowchart LR
     O["观测 o_t"] --> V["VAE Encoder"]
-    V --> Z["latent z_t"]
+    V --> Z["stochastic z_t"]
     Z --> W["动力学模型"]
     A["动作 a_t"] --> W
     W --> F["未来 latent"]
     F --> P["策略或规划器"]
 ```
 
-文字说明：VAE 先压缩观测，动力学模型在 latent 中预测未来，策略或规划器使用预测结果。
+文字说明：VAE 可把高维观测压成带不确定性的 latent；后续动力学、策略或规划器是否使用原始 VAE 目标，取决于具体架构。
 
 典型关联：
 
 - [World Models](https://arxiv.org/abs/1803.10122)：VAE 压缩图像后学习 latent dynamics；
-- [ACT](https://arxiv.org/abs/2304.13705)：CVAE 建模动作序列中的隐式风格；
-- [Dreamer](https://arxiv.org/abs/1912.01603)：在随机潜状态空间中学习未来。
+- [ACT](https://arxiv.org/abs/2304.13705)：CVAE 建模动作序列中未被观测完全解释的变化；
+- [Dreamer](https://arxiv.org/abs/1912.01603)：使用更一般的随机潜状态模型，不应简单等同于普通 VAE。
 
-### 6. 与相近方法的区别
+### 7. 与相近方法的区别
 
-| 方法 | latent | 优点 | 局限 |
+| 方法 | latent | 主要设计目标 | 新代价或风险 |
 |---|---|---|---|
-| AutoEncoder | 确定向量 | 简单直接 | 不一定可采样 |
-| VAE | 连续分布 | 可采样、概率解释清楚 | 可能 posterior collapse |
-| CVAE | 条件连续分布 | 表达条件下多种输出 | 条件过强时可能忽略 latent |
-| VQ-VAE | 离散 code | 适合 token 化 | 可能 codebook collapse |
+| AutoEncoder | 确定向量 | 直接压缩和重建 | 不保证可从简单分布采样 |
+| VAE | 连续分布 | 概率生成与规整 latent | likelihood/KL 权衡、posterior collapse |
+| CVAE | 条件连续分布 | 条件下多种合理输出 | 条件过强时可能忽略 latent |
+| VQ-VAE | 离散 code | 有限词表式表示 | codebook collapse 与量化误差 |
 
 ## L2：数学与实现
 

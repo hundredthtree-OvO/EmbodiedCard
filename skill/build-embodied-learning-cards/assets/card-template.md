@@ -37,13 +37,19 @@ Name the concrete system role and avoid claiming that a descendant architecture 
 
 ## L1：直觉与结构
 
-### 1. 从旧方法的局限出发
+### 1. 背景：前一方法已经解决了什么
 
-### 2. 核心思想
+Establish only the prerequisite context needed for the new design.
 
-Use `$z$` for inline math.
+### 2. 剩余矛盾与设计目标
 
-### 3. 结构或数据流
+State the concrete requirement the predecessor cannot satisfy. Do not introduce the new mechanism before its purpose is clear.
+
+### 3. 设计因果链
+
+For each major mechanism, explain `current problem → design choice → what it solves → new cost/problem`. Use `$z$` for inline math. For multi-stage systems, show the complete training and deployment flow here.
+
+### 4. 结构或数据流
 
 ```mermaid
 flowchart LR
@@ -53,11 +59,11 @@ flowchart LR
 
 Text equivalent: describe the same flow in one sentence.
 
-### 4. 输入、输出与张量形状
+### 5. 输入、输出与张量形状
 
-### 5. 在具身智能系统中的位置
+### 6. 在具身智能系统中的位置
 
-### 6. 与相近方法的区别
+### 7. 与相近方法的区别
 
 ## L2：数学与实现
 

@@ -3,7 +3,10 @@
 ## Teaching
 
 - Does L0 answer what, why, and where without unexplained equations?
-- Does L1 build a mental model from the limitation of a predecessor?
+- Does L1 state what the predecessor already solves before exposing what remains unsolved?
+- Does the card follow `background → limitation → design goal → mechanism → new cost` instead of listing mechanisms in parallel?
+- Is every major equation introduced by the concrete question or requirement it answers?
+- For multi-stage systems, are training stages and deployment/generation flows separated before local details?
 - Does L2 connect notation, equations, shapes, training, inference, and code?
 - Is a substantial derivation split into an atomic child card?
 - Do transfer questions require applying the idea to VLA/WAM rather than repeating definitions?

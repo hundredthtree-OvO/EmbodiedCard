@@ -8,7 +8,7 @@ prerequisites: [Conditional-Probability, Expectation, KL-Divergence]
 related: [VAE, Variational-Inference, Reparameterization-Trick]
 embodied_roles: [latent-model-training-objective, approximate-posterior-learning]
 created: 2026-07-11
-updated: 2026-07-11
+updated: 2026-07-12
 ---
 
 # ELBO（Evidence Lower Bound，证据下界）
@@ -45,61 +45,82 @@ ELBO 是不可直接计算的 $\log p_\theta(x)$ 的可优化下界。
 
 ## L1：直觉与结构
 
-### 1. 从旧方法的局限出发
+### 1. 背景：我们真正想优化的是 evidence
+
+对包含潜变量 $z$ 的生成模型，理想目标是让已观测数据 $x$ 的边缘似然尽可能大：
 
 ```math
-p_\theta(z\mid x)
-=
-\frac{p_\theta(x,z)}{p_\theta(x)}
+p_\theta(x)=\int p_\theta(x,z)\,dz
 ```
 
-计算后验需要 evidence，而 evidence 又需要对所有 $z$ 积分。
+这一步已经把“哪些 latent 能解释 $x$”全部积分掉，因此直接衡量模型对数据的解释能力。
 
-### 2. 核心思想
+### 2. 剩余矛盾与设计目标
+
+要计算 posterior：
 
 ```math
-\mathcal{L}_{\mathrm{ELBO}}
-=
-\mathbb{E}_{q_\phi(z\mid x)}
-\left[\log p_\theta(x\mid z)\right]
--
-D_{\mathrm{KL}}
-\left(q_\phi(z\mid x)\|p(z)\right)
+p_\theta(z\mid x)=\frac{p_\theta(x,z)}{p_\theta(x)}
 ```
 
-第一项要求 latent 解释数据，第二项让 posterior 与先验保持联系。
+分母正是通常不可解析的 evidence；而直接计算 evidence 又需要对所有 $z$ 积分。于是出现循环：
 
-### 3. 结构或数据流
+- 想训练生成模型，需要 $\log p_\theta(x)$；
+- 想推断哪些 $z$ 解释 $x$，需要 posterior；
+- posterior 和 evidence 都依赖同一个难积分。
+
+设计目标因此不是“发明一个新的 loss”，而是找到一个可采样、可求梯度、又确实与 $\log p_\theta(x)$ 有关系的替代目标。
+
+### 3. 设计因果链
+
+| 当前问题 | 设计选择 | 解决了什么 | 新问题或代价 |
+|---|---|---|---|
+| 真实 posterior 不可算 | 引入 $q_\phi(z\mid x)$ | 可以从近似 posterior 采样 | $q_\phi$ 与真实 posterior 有误差 |
+| evidence 难直接优化 | 构造 ELBO | 得到 $\log p_\theta(x)$ 的可优化下界 | 下界可能不紧 |
+| latent 必须解释数据 | expected log-likelihood | 奖励由 $z$ 重建/解释 $x$ | 期望通常需 Monte Carlo 估计 |
+| posterior 要能被 prior 支持 | prior KL | 连接训练 posterior 与生成 prior | KL 过强可能忽略 latent |
+| 优化器通常做最小化 | 取负 ELBO | 得到代码中的 loss | 容易混淆符号和 reduction |
+
+### 4. 结构或数据流
 
 ```mermaid
-flowchart TD
-    A["真实后验 p(z|x)"] --> B["需要 p(x)"]
-    B --> C["对所有 z 积分"]
-    C --> D["通常不可解"]
-    D --> E["qφ(z|x) + ELBO"]
+flowchart LR
+    X["数据 x"] --> Q["qφ(z|x)"]
+    Q --> Z["采样 z"]
+    Z --> L["log pθ(x|z)"]
+    Q --> K["KL(qφ || p)"]
+    L --> E["ELBO"]
+    K --> E
+    E --> N["取负后最小化"]
 ```
 
-文字说明：真实后验依赖不可解的边缘似然，因此用近似后验与 ELBO 训练。
+文字说明：近似 posterior 提供可采样的 $z$；likelihood 项要求 $z$ 解释数据，prior KL 连接训练时 posterior 与生成时 prior。
 
-### 4. 输入、输出与张量形状
+还应区分两个 KL：
 
-| 对象 | 形状 |
-|---|---|
-| `mu, logvar` | `[B, D_z]` |
-| 每维 KL | `[B, D_z]` |
-| 每样本 KL | `[B]` |
-| batch ELBO | scalar |
+- $D_{\mathrm{KL}}(q_\phi(z\mid x)\|p(z))$ 出现在可计算的 ELBO 中，是训练正则；
+- $D_{\mathrm{KL}}(q_\phi(z\mid x)\|p_\theta(z\mid x))$ 是 ELBO 与 log evidence 的 gap，通常不能直接计算。
 
-### 5. 在具身智能系统中的位置
+### 5. 输入、输出与张量形状
 
-动作 CVAE 中，训练 posterior 可以看到真实动作 chunk，而部署时只能使用先验。世界模型中，posterior 使用当前观测，prior 只使用历史和动作；KL 让 imagination 不依赖未来真实观测。
+| 对象 | 形状 | reduction |
+|---|---|---|
+| `mu, logvar` | `[B,D_z]` | 尚未聚合 |
+| 每维 KL | `[B,D_z]` | latent 维待求和 |
+| 每样本 KL | `[B]` | latent 维已求和 |
+| 每样本 log-likelihood 估计 | `[B]` | 观测维已按 likelihood 聚合 |
+| batch 负 ELBO | scalar | 最后对 batch 取均值 |
 
-### 6. 与相近方法的区别
+### 6. 在具身智能系统中的位置
 
-- MSE/BCE 只是特定似然下的重建项；
-- prior KL 是 ELBO 的正则；
-- true-posterior KL 是 ELBO gap；
-- IWAE 使用多个 importance samples 得到更紧的下界。
+动作 CVAE 中，训练 posterior 可以看到真实动作 chunk，而部署时只能使用 prior；prior KL 缩小两者差距。世界模型中，observation posterior 使用当前观测，dynamics prior 只依赖历史与动作；ELBO 类目标使 latent imagination 在部署时不依赖未来真实观测。
+
+### 7. 与相近目标的区别
+
+- MSE/BCE 是特定 likelihood 假设下的 reconstruction NLL，不等于完整 ELBO；
+- prior KL 是可计算的训练项，true-posterior KL 是通常不可计算的下界 gap；
+- maximum likelihood 是最终方向，ELBO 是在潜变量积分困难时采用的可优化下界；
+- IWAE 用多个 importance samples 构造通常更紧的下界，但计算更重。
 
 ## L2：数学与实现
 

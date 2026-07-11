@@ -20,14 +20,16 @@ Create durable, technically rigorous learning cards that explain not only what a
 
 1. Define one core concept per `.md` file. Use a main card plus atomic child cards for substantial derivations, failure modes, or prerequisites.
 2. Determine the user's likely knowledge boundary from the request and existing cards. Explain prerequisites briefly; link to a child card when the explanation would interrupt the main line.
-3. Research before writing when claims depend on a paper, implementation, current method, or exact architecture. Follow `references/source-policy.md`.
-4. Start from `assets/card-template.md`. Include L0–L2 unless the user requests another depth. Leave a concise L3 backlog rather than expanding it automatically.
-5. Connect the concept to concrete embodied uses. Distinguish a classical module from descendants that merely share its principles; for example, do not call RSSM a plain VAE.
-6. Include minimal PyTorch when implementation helps understanding. For every key loss or estimator, connect the mathematical objective to code through the modeling assumption, algebraic simplification, approximation, tensor shape, and reduction. Never present MSE, BCE, cross-entropy, a straight-through estimator, or a sampled expectation as an unexplained replacement for the equation.
-7. Add compact Mermaid only when structure, sequence, or dependency is easier to understand visually. Always follow a diagram with a one-sentence text equivalent.
-8. Add self-tests at memory, understanding, and transfer levels. Put answers in standard HTML `<details>` blocks compatible with GitHub.
-9. Add primary references and label inferences as inferences.
-10. Run `python3 scripts/validate_card.py <card-or-directory>` and fix every error before delivery.
+3. Build a causal design story before presenting mechanisms: state what the predecessor already solves, expose the remaining contradiction, name the new design goal, then show how each mechanism solves one problem while creating the next. Use the chain `background → limitation → design goal → mechanism → new cost or failure mode`; do not add a detached history section.
+4. For multi-stage systems, show the complete training and deployment pipeline early. Separate representation learning, prior or dynamics learning, inference, and generation before diving into local equations.
+5. Research before writing when claims depend on a paper, implementation, current method, or exact architecture. Follow `references/source-policy.md`.
+6. Start from `assets/card-template.md`. Include L0–L2 unless the user requests another depth. Leave a concise L3 backlog rather than expanding it automatically.
+7. Connect the concept to concrete embodied uses. Distinguish a classical module from descendants that merely share its principles; for example, do not call RSSM a plain VAE.
+8. Include minimal PyTorch when implementation helps understanding. For every key loss or estimator, connect the mathematical objective to code through the modeling assumption, algebraic simplification, approximation, tensor shape, and reduction. Never present MSE, BCE, cross-entropy, a straight-through estimator, or a sampled expectation as an unexplained replacement for the equation.
+9. Add compact Mermaid only when structure, sequence, or dependency is easier to understand visually. Always follow a diagram with a one-sentence text equivalent.
+10. Add self-tests at memory, understanding, and transfer levels. Put answers in standard HTML `<details>` blocks compatible with GitHub.
+11. Add primary references and label inferences as inferences.
+12. Run `python3 scripts/validate_card.py <card-or-directory>` and fix every error before delivery.
 
 ## Enforce Markdown and math portability
 
@@ -49,7 +51,7 @@ Target standard VS Code Markdown Preview and GitHub Markdown, not Obsidian synta
 Use this sequence:
 
 1. **L0 — orientation**: one-sentence definition, problem solved, embodied role, three takeaways.
-2. **L1 — mental model**: predecessor's limitation, intuition, architecture/data flow, inputs and outputs, VLA/WAM placement, nearby-method comparison.
+2. **L1 — mental model**: predecessor capability and limitation, the contradiction that motivates the new design, a purpose→mechanism→new-cost chain, complete multi-stage data flow, inputs and outputs, VLA/WAM placement, and nearby-method comparison.
 3. **L2 — mechanism**: notation, core equations, derivation at the appropriate depth, numeric example, tensor shapes, training versus inference, pseudocode, PyTorch, formula-to-code mapping with assumptions and reductions, hyperparameters, failure modes, misconceptions.
 4. **Navigation**: prerequisites, atomic child cards, comparisons, and next card.
 5. **L3 backlog**: paper-level derivations, source mapping, variants, and open research questions to add later.
@@ -71,6 +73,9 @@ Use the taxonomy in `references/card-taxonomy.md` as a starting point, adapting 
 
 Read `references/quality-checklist.md` before finalizing a new template style or a high-stakes mathematical card. At minimum verify:
 
+- L1 forms a causal design story rather than a list of parallel facts;
+- each major mechanism is introduced by the problem it must solve and followed by its new cost or limitation;
+- multi-stage training and deployment responsibilities are separated early;
 - symbols are defined before use;
 - posterior, prior, likelihood, loss, and inference-time behavior are not conflated;
 - equations and code use the same reduction and sign conventions;

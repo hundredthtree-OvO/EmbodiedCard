@@ -26,3 +26,16 @@ flowchart TD
 ```
 
 文字说明：VAE/CVAE 的概率潜变量思想分别进入动作序列生成和世界模型；RSSM 则进一步处理时序状态与想象 rollout。
+## Transformer 推理路线
+
+```mermaid
+flowchart LR
+    A["Self-Attention"] --> C["Causal Attention"]
+    C --> D["Autoregressive Decoding"]
+    D --> K["KV-cache"]
+    K --> G["GQA / MQA"]
+    K --> P["PagedAttention"]
+    K --> Q["Cache Quantization"]
+```
+
+文字说明：causal attention 支撑逐 token 解码；KV-cache 复用历史 K/V，随后通过 GQA/MQA、分页管理和量化缓解显存与带宽瓶颈。
