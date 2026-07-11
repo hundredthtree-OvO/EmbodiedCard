@@ -67,9 +67,9 @@ Text equivalent: describe the same flow in one sentence.
 
 Use display math exactly like this:
 
-$$
+```math
 \mathcal{L}(\theta)=\mathbb{E}_{x\sim p_{\mathrm{data}}}[\ell_\theta(x)]
-$$
+```
 
 ### 3. 公式的逐步解释或推导
 

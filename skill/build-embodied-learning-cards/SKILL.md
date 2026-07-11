@@ -35,12 +35,12 @@ Target standard VS Code Markdown Preview and GitHub Markdown, not Obsidian synta
 
 - Use `[label](relative/path.md)`, never `[[Wiki Links]]`.
 - Use `$...$` for inline math.
-- Use a standalone `$$` line before and after display math.
-- Never use `\(...\)` or `\[...\]`; these are inconsistently handled and may lose backslashes in file-transfer paths.
+- Use fenced `math` blocks for display math, with ` ```math ` and ` ``` ` on standalone lines.
+- Never use `$$...$$`, `\(...\)`, or `\[...\]`; fenced `math` blocks are more reliable for complex GitHub formulas.
 - Keep a blank line before and after every display-math block.
 - Do not place display math inside tables. Use short inline math in cells and move long formulas below the table.
 - Avoid tabs and unescaped control characters in formulas.
-- Use `\begin{aligned}...\end{aligned}` only inside `$$` delimiters.
+- Use `\begin{aligned}...\end{aligned}` only inside fenced `math` blocks.
 - Prefer LaTeX commands such as `\mu`, `\theta`, and `\mathcal{L}` inside math delimiters; Unicode symbols are acceptable in diagrams and prose.
 - Mention that VS Code's built-in preview must have `markdown.math.enabled` enabled if valid `$`/`$$` formulas still do not render.
 

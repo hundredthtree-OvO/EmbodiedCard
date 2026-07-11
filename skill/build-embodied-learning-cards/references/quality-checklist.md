@@ -16,7 +16,7 @@
 - Are prior, approximate posterior, and true posterior distinguished?
 - Are per-sample, per-dimension, sum, and mean reductions explicit?
 - Was every numeric example independently recalculated?
-- Are all inline formulas delimited by `$` and display formulas by standalone `$$` lines?
+- Are all inline formulas delimited by `$` and display formulas enclosed by fenced `math` blocks?
 
 ## Code
 

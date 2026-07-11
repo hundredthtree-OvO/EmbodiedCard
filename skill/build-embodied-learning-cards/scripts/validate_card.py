@@ -76,7 +76,10 @@ def validate(path: Path) -> list[str]:
         errors.append("contains Obsidian-style wiki links")
 
     if re.search(r"\\\(|\\\)|\\\[|\\\]", text):
-        errors.append(r"contains incompatible math delimiters; use $...$ and $$...$$")
+        errors.append(r"contains incompatible math delimiters; use $...$ and fenced math blocks")
+
+    if any(line.strip() == "$$" for line in text.splitlines()):
+        errors.append("contains $$ display-math delimiters; use fenced math blocks")
 
     if "\t" in text:
         errors.append("contains tab characters; possible escaped-math corruption")
@@ -90,12 +93,16 @@ def validate(path: Path) -> list[str]:
     ):
         errors.append("contains LaTeX commands outside $ math delimiters")
 
-    display_delimiters = sum(1 for line in text.splitlines() if line.strip() == "$$")
-    if display_delimiters % 2:
-        errors.append("has an unmatched display-math $$ delimiter")
-    for block in re.findall(r"^\$\$\s*$\n(.*?)^\$\$\s*$", text, re.DOTALL | re.MULTILINE):
-        if "$" in block:
-            errors.append("contains $ delimiters inside a $$ display-math block")
+    math_blocks = re.findall(r"^```math\s*$\n(.*?)^```\s*$", text, re.DOTALL | re.MULTILINE)
+    without_math = re.sub(
+        r"^```math\s*$\n.*?^```\s*$", "", text, flags=re.DOTALL | re.MULTILINE
+    )
+    without_fences = re.sub(r"```.*?```", "", without_math, flags=re.DOTALL)
+    if re.search(r"\\begin\{aligned\}|\\boxed\b", without_fences):
+        errors.append(r"contains aligned or boxed LaTeX outside a fenced math block")
+    for block in math_blocks:
+        if re.search(r"(?<!\\)\$(?!\$)", block):
+            errors.append("contains inline $ delimiters inside a fenced math block")
             break
 
     if text.count("```") % 2:

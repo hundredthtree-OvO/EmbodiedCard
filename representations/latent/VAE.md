@@ -48,9 +48,9 @@ ACT 使用动作序列 CVAE；Dreamer 的 RSSM 是更一般的随机潜状态模
 
 普通 AutoEncoder：
 
-$$
+```math
 z=f_\phi(x),\qquad \hat{x}=g_\theta(z)
-$$
+```
 
 只优化 $d(x,\hat{x})$ 时，训练编码之间可能存在 Decoder 从未见过的区域，从简单分布随机采样也未必得到有效样本。
 
@@ -58,25 +58,25 @@ $$
 
 VAE 把确定性编码改为概率编码：
 
-$$
+```math
 x\rightarrow q_\phi(z\mid x)
-$$
+```
 
 常见近似后验为：
 
-$$
+```math
 q_\phi(z\mid x)
 =
 \mathcal{N}\!\left(
 z;\mu_\phi(x),\operatorname{diag}(\sigma_\phi^2(x))
 \right)
-$$
+```
 
 并选择简单先验：
 
-$$
+```math
 p(z)=\mathcal{N}(0,I)
-$$
+```
 
 ### 3. 结构或数据流
 
@@ -149,7 +149,7 @@ flowchart LR
 
 ### 2. 核心公式
 
-$$
+```math
 \mathcal{L}_{\mathrm{ELBO}}(x)
 =
 \mathbb{E}_{q_\phi(z\mid x)}
@@ -157,11 +157,11 @@ $$
 -
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p(z)\right)
-$$
+```
 
 训练通常最小化负 ELBO：
 
-$$
+```math
 \mathcal{J}_{\mathrm{VAE}}
 =
 -\mathbb{E}_{q_\phi(z\mid x)}
@@ -169,7 +169,7 @@ $$
 +
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p(z)\right)
-$$
+```
 
 重建项由似然假设决定：Bernoulli 常对应 BCE，固定方差 Gaussian 常对应与 MSE 成比例的负对数似然。
 
@@ -177,46 +177,46 @@ $$
 
 对角高斯与标准正态之间的 KL：
 
-$$
+```math
 D_{\mathrm{KL}}(q\|p)
 =
 \frac{1}{2}\sum_{j=1}^{d}
 \left(
 \mu_j^2+\sigma_j^2-\log\sigma_j^2-1
 \right)
-$$
+```
 
 若代码输出 $\mathrm{logvar}=\log\sigma^2$：
 
-$$
+```math
 D_{\mathrm{KL}}(q\|p)
 =
 -\frac{1}{2}\sum_{j=1}^{d}
 \left(
 1+\mathrm{logvar}_j-\mu_j^2-\exp(\mathrm{logvar}_j)
 \right)
-$$
+```
 
 重参数化：
 
-$$
+```math
 \epsilon\sim\mathcal{N}(0,I),\qquad
 z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon
-$$
+```
 
 ### 4. 最小数值例子
 
 设 $\mu=1.0$、$\log\sigma^2=-0.693$，则 $\sigma^2\approx0.5$、$\sigma\approx0.707$。若 $\epsilon=0.3$：
 
-$$
+```math
 z=1.0+0.707\times0.3\approx1.212
-$$
+```
 
 该维 KL 约为：
 
-$$
+```math
 \frac12\left(1.0^2+0.5-\log0.5-1\right)\approx0.597
-$$
+```
 
 ### 5. 训练与推理
 
@@ -296,9 +296,9 @@ def vae_loss(recon, x, mu, logvar):
 
 Posterior collapse：
 
-$$
+```math
 q_\phi(z\mid x)\approx p(z)
-$$
+```
 
 此时 Decoder 基本忽略 $z$。常见信号是 KL 接近 0、改变 $z$ 对输出影响很小。
 

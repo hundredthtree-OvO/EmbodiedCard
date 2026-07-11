@@ -23,11 +23,11 @@ ELBO 是不可直接计算的 $\log p_\theta(x)$ 的可优化下界。
 
 ### 它解决什么问题
 
-$$
+```math
 \log p_\theta(x)
 =
 \log\int p_\theta(x,z)\,dz
-$$
+```
 
 复杂模型通常使这个积分不可解析。ELBO 引入近似后验 $q_\phi(z\mid x)$，把问题变为可采样、可梯度优化的目标。
 
@@ -47,17 +47,17 @@ $$
 
 ### 1. 从旧方法的局限出发
 
-$$
+```math
 p_\theta(z\mid x)
 =
 \frac{p_\theta(x,z)}{p_\theta(x)}
-$$
+```
 
 计算后验需要 evidence，而 evidence 又需要对所有 $z$ 积分。
 
 ### 2. 核心思想
 
-$$
+```math
 \mathcal{L}_{\mathrm{ELBO}}
 =
 \mathbb{E}_{q_\phi(z\mid x)}
@@ -65,7 +65,7 @@ $$
 -
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p(z)\right)
-$$
+```
 
 第一项要求 latent 解释数据，第二项让 posterior 与先验保持联系。
 
@@ -118,7 +118,7 @@ flowchart TD
 
 从 KL 开始：
 
-$$
+```math
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p_\theta(z\mid x)\right)
 =
@@ -126,11 +126,11 @@ D_{\mathrm{KL}}
 \left[
 \log\frac{q_\phi(z\mid x)}{p_\theta(z\mid x)}
 \right]
-$$
+```
 
 使用 Bayes 公式并移项：
 
-$$
+```math
 \boxed{
 \log p_\theta(x)
 =
@@ -139,21 +139,21 @@ $$
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p_\theta(z\mid x)\right)
 }
-$$
+```
 
 KL 非负，所以：
 
-$$
+```math
 \boxed{
 \mathcal{L}_{\mathrm{ELBO}}(x)\le\log p_\theta(x)
 }
-$$
+```
 
 ### 3. 公式的逐步解释或推导
 
 使用 $p_\theta(x,z)=p_\theta(x\mid z)p(z)$：
 
-$$
+```math
 \begin{aligned}
 \mathcal{L}_{\mathrm{ELBO}}(x)
 &=
@@ -168,11 +168,11 @@ $$
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p(z)\right)
 \end{aligned}
-$$
+```
 
 因此最小化：
 
-$$
+```math
 \mathcal{J}_{\mathrm{VAE}}
 =
 -\mathbb{E}_{q_\phi(z\mid x)}
@@ -180,11 +180,11 @@ $$
 +
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\|p(z)\right)
-$$
+```
 
 Jensen 路线：
 
-$$
+```math
 \begin{aligned}
 \log p_\theta(x)
 &=
@@ -201,7 +201,7 @@ $$
 &=
 \mathcal{L}_{\mathrm{ELBO}}(x)
 \end{aligned}
-$$
+```
 
 Jensen 直接证明下界；KL 恒等式说明 gap。
 
@@ -209,35 +209,35 @@ Jensen 直接证明下界；KL 恒等式说明 gap。
 
 设：
 
-$$
+```math
 q(z\mid x)=(0.75,0.25),\qquad p(z)=(0.5,0.5)
-$$
+```
 
 并且：
 
-$$
+```math
 p(x\mid z=0)=0.8,\qquad p(x\mid z=1)=0.2
-$$
+```
 
 则：
 
-$$
+```math
 \mathbb{E}_q[\log p(x\mid z)]\approx-0.570
-$$
+```
 
-$$
+```math
 D_{\mathrm{KL}}(q\|p)\approx0.131
-$$
+```
 
-$$
+```math
 \mathcal{L}_{\mathrm{ELBO}}\approx-0.701
-$$
+```
 
 而：
 
-$$
+```math
 \log p(x)=\log0.5\approx-0.693
-$$
+```
 
 所以 $-0.701\le-0.693$。
 
