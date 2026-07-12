@@ -39,3 +39,16 @@ flowchart LR
 ```
 
 文字说明：causal attention 支撑逐 token 解码；KV-cache 复用历史 K/V，随后通过 GQA/MQA、分页管理和量化缓解显存与带宽瓶颈。
+## 参数高效适配路线
+
+```mermaid
+flowchart LR
+    F["Full Fine-Tuning"] --> P["PEFT"]
+    R["Matrix Rank"] --> L["LoRA"]
+    P --> L
+    L --> Q["QLoRA"]
+    L --> A["AdaLoRA / DoRA"]
+    L --> V["VLA task adapters"]
+```
+
+文字说明：LoRA 用低秩增量替代完整权重更新，是 PEFT 的一种；它进一步通向量化训练、rank 自适应变体与具身任务 adapter。
