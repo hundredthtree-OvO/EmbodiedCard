@@ -68,3 +68,18 @@ flowchart LR
 ```
 
 文字说明：RSSM 结合 RNN 的确定性记忆与 VAE/ELBO 的随机 latent；观测 posterior 用传感器校正 belief，dynamics prior 支撑无未来观测的 imagination。
+
+## JEPA 表征预测路线
+
+```mermaid
+flowchart LR
+    S["Self-Supervised Learning"] --> J["JEPA"]
+    M["Masked Prediction"] --> J
+    E["EMA Teacher"] --> J
+    J --> I["I-JEPA: spatial features"]
+    J --> V["V-JEPA: spatiotemporal features"]
+    V --> W["Action-conditioned latent world model"]
+    I --> A["VLA visual encoder"]
+```
+
+文字说明：JEPA 将掩码预测移到表征空间；I-JEPA 学空间视觉语义，V-JEPA 扩展到时空特征，而具身规划仍需进一步加入动作条件的 dynamics 与任务目标。
