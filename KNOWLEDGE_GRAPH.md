@@ -83,3 +83,16 @@ flowchart LR
 ```
 
 文字说明：JEPA 将掩码预测移到表征空间；I-JEPA 学空间视觉语义，V-JEPA 扩展到时空特征，而具身规划仍需进一步加入动作条件的 dynamics 与任务目标。
+
+## CVAE 条件动作生成路线
+
+```mermaid
+flowchart LR
+    V["VAE / ELBO"] --> C["CVAE"]
+    O["Observation / Goal condition"] --> C
+    C --> Z["Strategy latent z"]
+    Z --> A["Multimodal action chunks"]
+    A --> R["Closed-loop replanning"]
+```
+
+文字说明：CVAE 在 VAE/ELBO 上加入观测或目标条件，用 latent 表示同一条件下的不同策略，生成的动作 chunk 仍需放入闭环执行与重规划系统。
