@@ -96,3 +96,18 @@ flowchart LR
 ```
 
 文字说明：CVAE 在 VAE/ELBO 上加入观测或目标条件，用 latent 表示同一条件下的不同策略，生成的动作 chunk 仍需放入闭环执行与重规划系统。
+
+## DiT 扩散 Transformer 路线
+
+```mermaid
+flowchart LR
+    D["DDPM noise prediction"] --> L["Latent Diffusion"]
+    V["VAE latent space"] --> L
+    T["Vision Transformer"] --> I["DiT"]
+    L --> I
+    I --> A["adaLN-Zero conditioning"]
+    I --> P["Diffusion action / trajectory model"]
+    P --> R["Closed-loop replanning"]
+```
+
+文字说明：DiT 保留 latent diffusion 的加噪与反向采样，只用带 adaLN-Zero 条件调制的 Transformer 替换 U-Net；迁移到具身任务时还需把图像 patches 改为动作或轨迹 tokens，并加入闭环重规划。
