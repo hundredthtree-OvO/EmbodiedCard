@@ -9,6 +9,7 @@
 | Joint-Embedding Predictive Architecture | [JEPA.md](representations/visual/JEPA.md) | L0–L2 | learning | 理解 latent prediction、EMA teacher 与语义表征学习 |
 | Key-Value Cache | [KV-Cache.md](architectures/transformer/KV-Cache.md) | L0–L2 | learning | 理解自回归推理中的 K/V 复用、复杂度与显存权衡 |
 | Diffusion Transformer | [DiT.md](architectures/transformer/DiT.md) | L0–L2 | learning | 理解 latent patches、adaLN-Zero 与 Transformer 去噪 |
+| Flow Matching | [Flow-Matching.md](action-modeling/flow-matching/Flow-Matching.md) | L0–L2 | learning | 理解条件速度回归、概率路径与 ODE 动作生成 |
 | Recurrent State-Space Model | [RSSM.md](architectures/world-model/RSSM.md) | L0–L2 | learning | 理解 belief state、prior/posterior 与 latent imagination |
 | Low-Rank Adaptation | [LoRA.md](architectures/transformer/LoRA.md) | L0–L2 | learning | 理解低秩权重更新、参数效率、初始化与合并部署 |
 
@@ -25,6 +26,5 @@
 
 - Action Chunking
 - Diffusion Policy
-- Flow Matching
 - Latent Dynamics Model
 - Value Function

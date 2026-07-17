@@ -111,3 +111,19 @@ flowchart LR
 ```
 
 文字说明：DiT 保留 latent diffusion 的加噪与反向采样，只用带 adaLN-Zero 条件调制的 Transformer 替换 U-Net；迁移到具身任务时还需把图像 patches 改为动作或轨迹 tokens，并加入闭环重规划。
+
+## Flow Matching 动作生成路线
+
+```mermaid
+flowchart LR
+    C["Continuity Equation"] --> F["Flow Matching"]
+    N["Gaussian source"] --> P["Conditional probability path"]
+    E["Expert action chunks"] --> P
+    P --> F
+    F --> V["Conditional velocity field"]
+    V --> O["ODE solver"]
+    O --> A["Multimodal action chunks"]
+    A --> R["Closed-loop replanning"]
+```
+
+文字说明：Flow Matching 从 Gaussian 与专家动作构造条件概率路径，回归其速度场；部署时 ODE solver 将噪声变成多模态动作 chunk，并在执行后闭环重规划。
