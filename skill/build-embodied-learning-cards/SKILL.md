@@ -66,7 +66,7 @@ Use the taxonomy in `references/card-taxonomy.md` as a starting point, adapting 
 - Store atomic cards near their main card when this keeps relative links simple.
 - Record prerequisites and related concepts in YAML frontmatter.
 - Update `INDEX.md` with the card title, path, level, status, and one-line purpose.
-- Update `KNOWLEDGE_GRAPH.md` with small topic-specific Mermaid graphs. Do not create one unreadable global graph.
+- Update `KNOWLEDGE_GRAPH.md` with small topic-specific Mermaid graphs. Add a new topic graph only when the card opens a genuinely new knowledge route; when it belongs to an existing route, extend that graph instead. For an atomic concept or a simple relationship, add only the necessary node or edge rather than creating a standalone graph. Consolidate overlapping graphs when this keeps the routes clearer, and do not create one unreadable global graph.
 - When updating an existing card, patch only the affected sections and update the `updated` date.
 
 ## Quality gate

@@ -26,6 +26,7 @@ flowchart TD
 ```
 
 文字说明：VAE/CVAE 的概率潜变量思想分别进入动作序列生成和世界模型；RSSM 则进一步处理时序状态与想象 rollout。
+
 ## Transformer 推理路线
 
 ```mermaid
@@ -84,46 +85,32 @@ flowchart LR
 
 文字说明：JEPA 将掩码预测移到表征空间；I-JEPA 学空间视觉语义，V-JEPA 扩展到时空特征，而具身规划仍需进一步加入动作条件的 dynamics 与任务目标。
 
-## CVAE 条件动作生成路线
+## 视觉—语言桥接路线
 
 ```mermaid
 flowchart LR
-    V["VAE / ELBO"] --> C["CVAE"]
-    O["Observation / Goal condition"] --> C
-    C --> Z["Strategy latent z"]
-    Z --> A["Multimodal action chunks"]
-    A --> R["Closed-loop replanning"]
+    I["Frozen Image Encoder"] --> V["Visual tokens"]
+    Q["Learnable Queries"] --> F["Q-Former"]
+    V --> F
+    F --> P["LLM-width projection"]
+    P --> L["Frozen LLM / VLA backbone"]
+    L --> A["Language or action head"]
 ```
 
-文字说明：CVAE 在 VAE/ELBO 上加入观测或目标条件，用 latent 表示同一条件下的不同策略，生成的动作 chunk 仍需放入闭环执行与重规划系统。
+文字说明：Q-Former 用少量 learnable queries 从冻结视觉编码器的 tokens 中主动提取固定长度表示，再投影给冻结 LLM 或 VLA backbone；动作生成仍由后续 action head 负责。
 
-## DiT 扩散 Transformer 路线
+## 生成式动作建模路线
 
 ```mermaid
 flowchart LR
-    D["DDPM noise prediction"] --> L["Latent Diffusion"]
-    V["VAE latent space"] --> L
-    T["Vision Transformer"] --> I["DiT"]
-    L --> I
-    I --> A["adaLN-Zero conditioning"]
-    I --> P["Diffusion action / trajectory model"]
-    P --> R["Closed-loop replanning"]
+    C["Observation / Goal condition"] --> V["Generative action model"]
+    D["Diffusion process"] --> I["DiT-style denoiser"]
+    I --> V
+    F["Flow Matching"] --> O["Conditional velocity + ODE solver"]
+    O --> V
+    A["CVAE strategy latent"] --> V
+    V --> K["Multimodal action chunks"]
+    K --> R["Closed-loop replanning"]
 ```
 
-文字说明：DiT 保留 latent diffusion 的加噪与反向采样，只用带 adaLN-Zero 条件调制的 Transformer 替换 U-Net；迁移到具身任务时还需把图像 patches 改为动作或轨迹 tokens，并加入闭环重规划。
-
-## Flow Matching 动作生成路线
-
-```mermaid
-flowchart LR
-    C["Continuity Equation"] --> F["Flow Matching"]
-    N["Gaussian source"] --> P["Conditional probability path"]
-    E["Expert action chunks"] --> P
-    P --> F
-    F --> V["Conditional velocity field"]
-    V --> O["ODE solver"]
-    O --> A["Multimodal action chunks"]
-    A --> R["Closed-loop replanning"]
-```
-
-文字说明：Flow Matching 从 Gaussian 与专家动作构造条件概率路径，回归其速度场；部署时 ODE solver 将噪声变成多模态动作 chunk，并在执行后闭环重规划。
+文字说明：CVAE、DiT-style diffusion 与 Flow Matching 是三种多模态动作生成路线；它们分别使用策略 latent、迭代去噪和速度场 ODE，最终都需要在机器人上闭环重规划。

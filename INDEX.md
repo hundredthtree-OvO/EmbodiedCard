@@ -7,6 +7,7 @@
 | Evidence Lower Bound | [ELBO.md](representations/latent/ELBO.md) | L0–L2 | learning | 理解 VAE/变分模型训练目标的数学来源 |
 | Vector-Quantized VAE | [VQ-VAE.md](representations/latent/VQ-VAE.md) | L0–L2 | learning | 理解离散 codebook、straight-through 与具身 tokenization |
 | Joint-Embedding Predictive Architecture | [JEPA.md](representations/visual/JEPA.md) | L0–L2 | learning | 理解 latent prediction、EMA teacher 与语义表征学习 |
+| Querying Transformer | [Q-Former.md](architectures/vla/Q-Former.md) | L0–L2 | learning | 理解 learnable queries、视觉 token 压缩与视觉—语言桥接 |
 | Key-Value Cache | [KV-Cache.md](architectures/transformer/KV-Cache.md) | L0–L2 | learning | 理解自回归推理中的 K/V 复用、复杂度与显存权衡 |
 | Diffusion Transformer | [DiT.md](architectures/transformer/DiT.md) | L0–L2 | learning | 理解 latent patches、adaLN-Zero 与 Transformer 去噪 |
 | Flow Matching | [Flow-Matching.md](action-modeling/flow-matching/Flow-Matching.md) | L0–L2 | learning | 理解条件速度回归、概率路径与 ODE 动作生成 |
