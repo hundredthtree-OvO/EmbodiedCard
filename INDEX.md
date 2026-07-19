@@ -2,6 +2,7 @@
 
 | 卡片 | 路径 | 层级 | 状态 | 用途 |
 |---|---|---|---|---|
+| Markov Decision Process | [MDP.md](foundations/reinforcement-learning/MDP.md) | L0–L2 | learning | 理解状态、转移、奖励、策略与长期序列决策 |
 | Variational Autoencoder | [VAE.md](representations/latent/VAE.md) | L0–L2 | learning | 理解概率潜变量、重参数化及其具身智能用途 |
 | Conditional Variational Autoencoder | [CVAE.md](representations/latent/CVAE.md) | L0–L2 | learning | 理解条件内多模态生成、条件先验与动作 latent |
 | Evidence Lower Bound | [ELBO.md](representations/latent/ELBO.md) | L0–L2 | learning | 理解 VAE/变分模型训练目标的数学来源 |

@@ -114,3 +114,20 @@ flowchart LR
 ```
 
 文字说明：CVAE、DiT-style diffusion 与 Flow Matching 是三种多模态动作生成路线；它们分别使用策略 latent、迭代去噪和速度场 ODE，最终都需要在机器人上闭环重规划。
+
+## 强化学习基础路线
+
+```mermaid
+flowchart LR
+    M["MDP"] --> P["Policy"]
+    M --> R["Reward and Return"]
+    M --> T["Transition Dynamics"]
+    P --> V["Value Function"]
+    R --> V
+    T --> V
+    V --> B["Bellman Equation"]
+    B --> L["TD / Q-Learning / Actor-Critic"]
+    M --> O["POMDP / Belief State"]
+```
+
+文字说明：MDP 定义状态、动作、转移和奖励；固定策略后可定义 return 与 value，进一步得到 Bellman 方程和主流 RL 学习方法；观测不充分时则扩展到 POMDP 与 belief state。
