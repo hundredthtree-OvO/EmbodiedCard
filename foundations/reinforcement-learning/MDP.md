@@ -537,8 +537,9 @@ Offline RL 或 learned world model 只能从数据估计 $P,r$。对数据未覆
 
 ### 原子子卡
 
-- Reward vs Return（待创建）
-- Discount Factor（待创建）
+- [Return 与 Discount Factor](Return-and-Discount-Factor.md)
+- [Value Function](Value-Function.md)
+- [Bellman Equation](Bellman-Equation.md)
 - Trajectory Distribution（待创建）
 - Terminal vs Truncation（待创建）
 
@@ -550,7 +551,7 @@ Offline RL 或 learned world model 只能从数据估计 $P,r$。对数据未覆
 
 ### 下一张推荐卡
 
-学习 Value Function，再从 return 的条件期望推导 Bellman expectation equation；之后才能看清 TD、Q-learning、Actor-Critic 与 PPO 在估计或优化什么。
+先学习 [Return 与 Discount Factor](Return-and-Discount-Factor.md)，再用 [Value Function](Value-Function.md) 将轨迹回报变成条件期望，最后通过 [Bellman Equation](Bellman-Equation.md) 理解一步递推；之后就能看清 TD、Q-learning、Actor-Critic 与 PPO 在估计或优化什么。
 
 ## 参考资料
 

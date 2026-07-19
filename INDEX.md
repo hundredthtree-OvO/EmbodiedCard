@@ -3,6 +3,9 @@
 | 卡片 | 路径 | 层级 | 状态 | 用途 |
 |---|---|---|---|---|
 | Markov Decision Process | [MDP.md](foundations/reinforcement-learning/MDP.md) | L0–L2 | learning | 理解状态、转移、奖励、策略与长期序列决策 |
+| Return 与 Discount Factor | [Return-and-Discount-Factor.md](foundations/reinforcement-learning/Return-and-Discount-Factor.md) | L0–L2 | learning | 理解单步奖励如何累积为长期回报，以及折扣因子的时间尺度含义 |
+| Value Function | [Value-Function.md](foundations/reinforcement-learning/Value-Function.md) | L0–L2 | learning | 理解 Return 的条件期望，以及 V、Q、Advantage 的关系 |
+| Bellman Equation | [Bellman-Equation.md](foundations/reinforcement-learning/Bellman-Equation.md) | L0–L2 | learning | 理解价值的一步递推、固定点与 TD target 的来源 |
 | Variational Autoencoder | [VAE.md](representations/latent/VAE.md) | L0–L2 | learning | 理解概率潜变量、重参数化及其具身智能用途 |
 | Conditional Variational Autoencoder | [CVAE.md](representations/latent/CVAE.md) | L0–L2 | learning | 理解条件内多模态生成、条件先验与动作 latent |
 | Evidence Lower Bound | [ELBO.md](representations/latent/ELBO.md) | L0–L2 | learning | 理解 VAE/变分模型训练目标的数学来源 |
@@ -29,4 +32,3 @@
 - Action Chunking
 - Diffusion Policy
 - Latent Dynamics Model
-- Value Function

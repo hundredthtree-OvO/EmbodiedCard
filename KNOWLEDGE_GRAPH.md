@@ -120,7 +120,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     M["MDP"] --> P["Policy"]
-    M --> R["Reward and Return"]
+    M --> R["Return + Discount Factor"]
     M --> T["Transition Dynamics"]
     P --> V["Value Function"]
     R --> V
@@ -130,4 +130,4 @@ flowchart LR
     M --> O["POMDP / Belief State"]
 ```
 
-文字说明：MDP 定义状态、动作、转移和奖励；固定策略后可定义 return 与 value，进一步得到 Bellman 方程和主流 RL 学习方法；观测不充分时则扩展到 POMDP 与 belief state。
+文字说明：MDP 定义状态、动作、转移和奖励；单步 reward 经折扣累积为 return，固定策略下对 return 取条件期望得到 value，value 的一步一致性关系就是 Bellman 方程，并进一步连接到 TD、Q-learning 与 Actor-Critic；观测不充分时则扩展到 POMDP 与 belief state。
