@@ -8,7 +8,7 @@ prerequisites: [Conditional-Probability, Expectation, Markov-Property]
 related: [Policy, Return, Value-Function, Bellman-Equation, POMDP]
 embodied_roles: [sequential-decision-model, robot-control-formulation, world-model-interface]
 created: 2026-07-19
-updated: 2026-07-19
+updated: 2026-07-20
 ---
 
 # Markov Decision Process（MDP，马尔可夫决策过程）
@@ -540,6 +540,7 @@ Offline RL 或 learned world model 只能从数据估计 $P,r$。对数据未覆
 - [Return 与 Discount Factor](Return-and-Discount-Factor.md)
 - [Value Function](Value-Function.md)
 - [Bellman Equation](Bellman-Equation.md)
+- [Temporal-Difference Learning](Temporal-Difference-Learning.md)
 - Trajectory Distribution（待创建）
 - Terminal vs Truncation（待创建）
 
@@ -551,7 +552,7 @@ Offline RL 或 learned world model 只能从数据估计 $P,r$。对数据未覆
 
 ### 下一张推荐卡
 
-先学习 [Return 与 Discount Factor](Return-and-Discount-Factor.md)，再用 [Value Function](Value-Function.md) 将轨迹回报变成条件期望，最后通过 [Bellman Equation](Bellman-Equation.md) 理解一步递推；之后就能看清 TD、Q-learning、Actor-Critic 与 PPO 在估计或优化什么。
+先学习 [Return 与 Discount Factor](Return-and-Discount-Factor.md)，再用 [Value Function](Value-Function.md) 将轨迹回报变成条件期望，通过 [Bellman Equation](Bellman-Equation.md) 理解一步递推，最后学习 [Temporal-Difference Learning](Temporal-Difference-Learning.md) 如何用采样和 bootstrap 逼近该递推；之后就能看清 Q-learning、Actor-Critic 与 PPO 在估计或优化什么。
 
 ## 参考资料
 

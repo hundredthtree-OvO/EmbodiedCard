@@ -8,7 +8,7 @@ prerequisites: [MDP, Return-and-Discount-Factor, Conditional-Expectation]
 related: [Bellman-Equation, Advantage-Function, Temporal-Difference, Actor-Critic]
 embodied_roles: [state-evaluation, action-evaluation, critic-learning, trajectory-ranking]
 created: 2026-07-19
-updated: 2026-07-19
+updated: 2026-07-20
 ---
 
 # Value Function（价值函数）
@@ -367,6 +367,20 @@ Return 是有噪声的监督样本；只有在分布上平均才对应 value。
 <details>
 <summary>参考答案</summary>
 
+**基础题**
+
+1. $G_t$ 是某一条实际轨迹从时刻 $t$ 开始得到的折扣回报样本，会随未来动作和环境随机性变化；$v_\pi(s)=\mathbb{E}_\pi[G_t\mid S_t=s]$ 是固定策略下对所有这些可能未来取条件期望。
+2. $V$ 只条件化状态，并把策略在该状态选择的首动作也平均掉；$Q$ 额外固定首动作 $A_t=a$，所以可以比较“在同一状态先做不同动作”的长期结果。首动作之后仍按策略 $\pi$ 行动。
+3. $A_\pi(s,a)>0$ 表示该动作的 $Q$ 高于策略在状态 $s$ 的平均价值，因此它优于当前策略的平均动作；这不保证即时 reward 为正，也不保证最终一定成功。
+
+**理解题**
+
+1. 对固定状态 $s$，总体平方误差 $\mathbb{E}[(f(s)-G)^2\mid S=s]$ 的最小值在 $f(s)=\mathbb{E}[G\mid S=s]$ 处取得。因此单个 Return 只是有噪声的监督样本，而对大量样本最小化 MSE 会逼近条件均值，即 value。
+2. 由 $A_\pi(s,a)=q_\pi(s,a)-v_\pi(s)$ 和 $v_\pi(s)=\sum_a\pi(a\mid s)q_\pi(s,a)$，可得 $\sum_a\pi(a\mid s)A_\pi(s,a)=v_\pi(s)-v_\pi(s)=0$。
+3. Value 对未来动作分布取期望。策略改变会改变后续动作的概率，进而改变未来状态、reward 和 Return 的分布，所以即便环境与状态不变，$v_\pi$ 和 $q_\pi$ 的目标也通常随策略变化。
+
+**迁移题**
+
 单帧观测无法区分速度方向，发生 perceptual aliasing：相同输入对应不同 Return 分布，critic 只能学到混合平均值。可加入历史帧、本体速度，或使用 RNN/状态空间模型形成 belief state。
 
 </details>
@@ -388,7 +402,7 @@ Return 是有噪声的监督样本；只有在分布上平均才对应 value。
 ### 对比卡片
 
 - Reward vs Return（见 Return 卡）
-- Monte Carlo vs Temporal-Difference（待创建）
+- [Monte Carlo vs Temporal-Difference](Temporal-Difference-Learning.md#7-与相近方法的区别)（见 TD 卡）
 - On-policy vs Off-policy（待创建）
 
 ### 下一张推荐卡
