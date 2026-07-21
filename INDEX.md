@@ -7,6 +7,8 @@
 | Value Function | [Value-Function.md](foundations/reinforcement-learning/Value-Function.md) | L0–L2 | learning | 理解 Return 的条件期望，以及 V、Q、Advantage 的关系 |
 | Bellman Equation | [Bellman-Equation.md](foundations/reinforcement-learning/Bellman-Equation.md) | L0–L2 | learning | 理解价值的一步递推、固定点与 TD target 的来源 |
 | Temporal-Difference Learning | [Temporal-Difference-Learning.md](foundations/reinforcement-learning/Temporal-Difference-Learning.md) | L0–L2 | learning | 理解无模型的一步 bootstrap、TD error 与 critic 更新 |
+| On-policy vs Off-policy | [On-policy-vs-Off-policy.md](foundations/reinforcement-learning/On-policy-vs-Off-policy.md) | L0–L2 | learning | 理解行为策略、目标策略、数据复用与分布校正 |
+| Eligibility Traces 与 TD($\lambda$) | [Eligibility-Traces-and-TD-Lambda.md](foundations/reinforcement-learning/Eligibility-Traces-and-TD-Lambda.md) | L0–L2 | learning | 理解 $\lambda$-return、trace 递推与多步信用传播 |
 | Variational Autoencoder | [VAE.md](representations/latent/VAE.md) | L0–L2 | learning | 理解概率潜变量、重参数化及其具身智能用途 |
 | Conditional Variational Autoencoder | [CVAE.md](representations/latent/CVAE.md) | L0–L2 | learning | 理解条件内多模态生成、条件先验与动作 latent |
 | Evidence Lower Bound | [ELBO.md](representations/latent/ELBO.md) | L0–L2 | learning | 理解 VAE/变分模型训练目标的数学来源 |

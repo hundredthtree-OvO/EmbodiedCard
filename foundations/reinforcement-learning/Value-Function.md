@@ -8,7 +8,7 @@ prerequisites: [MDP, Return-and-Discount-Factor, Conditional-Expectation]
 related: [Bellman-Equation, Advantage-Function, Temporal-Difference, Actor-Critic]
 embodied_roles: [state-evaluation, action-evaluation, critic-learning, trajectory-ranking]
 created: 2026-07-19
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # Value Function（价值函数）
@@ -403,7 +403,7 @@ Return 是有噪声的监督样本；只有在分布上平均才对应 value。
 
 - Reward vs Return（见 Return 卡）
 - [Monte Carlo vs Temporal-Difference](Temporal-Difference-Learning.md#7-与相近方法的区别)（见 TD 卡）
-- On-policy vs Off-policy（待创建）
+- [On-policy vs Off-policy](On-policy-vs-Off-policy.md)
 
 ### 下一张推荐卡
 

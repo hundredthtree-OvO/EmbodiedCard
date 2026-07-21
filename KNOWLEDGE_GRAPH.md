@@ -127,9 +127,12 @@ flowchart LR
     T --> V
     V --> B["Bellman Equation"]
     B --> TD["Temporal-Difference Learning"]
+    TD --> ET["Eligibility Traces / TD(lambda)"]
+    P --> OO["On-policy / Off-policy"]
+    TD --> OO
     TD --> Q["Q-Learning"]
     TD --> AC["Sarsa / Actor-Critic"]
     M --> O["POMDP / Belief State"]
 ```
 
-文字说明：MDP 定义状态、动作、转移和奖励；单步 reward 经折扣累积为 return，固定策略下对 return 取条件期望得到 value，value 的一步一致性关系就是 Bellman 方程；TD 再用 sampled transition 与 bootstrap 近似求解该关系，并连接到 Q-learning、Sarsa 与 Actor-Critic。观测不充分时则扩展到 POMDP 与 belief state。
+文字说明：MDP 定义状态、动作、转移和奖励；单步 reward 经折扣累积为 return，固定策略下对 return 取条件期望得到 value，value 的一步一致性关系就是 Bellman 方程；TD 用 sampled transition 与 bootstrap 近似求解该关系，Eligibility Traces/TD(lambda) 将一步更新扩展为多步信用传播，而 On-policy/Off-policy 区分数据策略和目标策略，并进一步连接到 Q-learning、Sarsa 与 Actor-Critic。观测不充分时则扩展到 POMDP 与 belief state。
